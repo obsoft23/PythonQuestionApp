@@ -7,13 +7,7 @@ class QuizQuestion:
         self.correct_option = correct_option
 
     def is_correct(self, user_answer):
-        if user_answer == self.correct_option:
-            return True
-        else:
-            return False
-        
-    
-   
+        return user_answer == self.correct_option
 
 class Quiz:
     def __init__(self):
@@ -24,7 +18,44 @@ class Quiz:
 
     def add_question(self, question):
         self.questions.append(question)
-    
+
+    def take_quiz(self):
+        random.shuffle(self.questions)
+        for question_num, question in enumerate(self.questions, start=1):
+
+            if question_num == 1:
+                print(f"/*--- WELCOME  {self.username} 😱----*/")
+            
+            print(f"Question {question_num}: {question.question}")
+            print(question.question)
+           
+            for i, option in enumerate(question.options):
+                print(f"{i + 1}. {option}")
+
+            while True:
+                user_answer = input("Enter the number of your answer (1 to 4): ")
+                if user_answer.isdigit():
+                    user_answer = int(user_answer)
+                    if 1 <= user_answer <= 4:
+                        break
+                    else:
+                        print("Please enter a number between 1 and 4.")
+                else:
+                    print("Invalid input. Please enter a valid number.")
+
+            if question.is_correct(user_answer - 1):
+                print("Correct🥰🥳🥰!\n")
+                self.score += 1
+                print("/-------------------/")
+            else:
+                print("Wrong Answer😭😭😭!\n")
+                print("/-------------------/")
+
+        percentage_score = (self.score / len(self.questions)) * 100
+        print(f"You got {self.score} out of {len(self.questions)} questions correct.")
+        print(f"Your percentage score: {percentage_score:.2f}%")
+        print("/------- QUIZ ENDS--------/")
+
     def reset(self):
         self.score = 0
 
@@ -34,48 +65,13 @@ class Quiz:
     def get_average_score(self):
         if not self.high_scores:
             return 0
-        return sum(self.high_scores) / len(self.high_scores)
-
-
-
-    def take_quiz(self):
-        random.shuffle(self.questions)
-        for question in self.questions:
-            print("/*------------------------------------*/")
-            print(question.question)
-            for i, option in enumerate(question.options):
-                print(f"{i + 1}. {option}")
-
-        while True:
-            user_answer = input("Please select a number of your answer  between  (1 to 4): ")
-            if user_answer.isdigit():
-                    user_answer = int(user_answer)
-                    if 1 <= user_answer <= 4:
-                        break
-                    else:
-                        print("Please enter a number between 1 and 4.")
-            else:
-                print("Invalid input. Please enter a valid number, between  (1 to 4):")
-
-
-            if question.is_correct(user_answer):
-                print("Correct🥳🥳!\n")
-                self.score += 1
-            else:
-                print("Incorrect😭!\n")
-      
-        
-            percentage_score = (self.score / len(self.questions)) * 100
-            print(f"You got {self.score} out of {len(self.questions)} questions correct.")
-            print(f"Your percentage score: {percentage_score:.2f}%")
-
-    def reset(self):
-        self.score = 0
+        total_score = sum(score for _, score in self.high_scores)
+        return total_score / len(self.high_scores)
 
 if __name__ == "__main__":
     quiz = Quiz()
 
-# Add your quiz questions here
+    # Adding quiz questions here
     question1 = QuizQuestion("What is the capital of England?", ["London", "Berlin", "Paris", "Madrid"], 0)
     question2 = QuizQuestion("Who was the 44th president of the United States?", ["Obama", "Trump", "Biden", "Nixon"], 0)
     question3 = QuizQuestion("What is the speed limit on highways in the United Kingdom", ["30mph", "40mph", "80mph", "70mph"], 3)
@@ -110,17 +106,35 @@ if __name__ == "__main__":
     quiz.add_question(question15)
 
     
-   
 
-while True:
-        quiz.username = input("Please can your enter your name: ")
+    while True:
+        quiz.username = input("Enter your name: ")
+        if not quiz.username:
+            print("Username cannot be empty. Please enter your name.")
+            continue
+
+        while True:
+            num_questions = input("Enter the number of questions you want to answer: ")
+            if num_questions.isdigit():
+                num_questions = int(num_questions)
+                if 1 <= num_questions <= len(quiz.questions):
+                    break
+                else:
+                    print(f"Please enter a number between 1 and {len(quiz.questions)}.")
+            else:
+                print("Invalid input. Please enter a valid number.")
+
+        selected_questions = random.sample(quiz.questions, num_questions)
+        quiz.questions = selected_questions
         quiz.take_quiz()
-        quiz.add_high_score(quiz.username, quiz.score)
+        quiz.add_high_score(quiz.username, quiz.score) 
         average_score = quiz.get_average_score()
-        print("Average score: {average_score:.2f}")
+        print(f"Average score: {average_score:.2f}")
         choice = input("Do you want to take the quiz again? (yes/no): ")
         if choice.lower() != 'yes':
             break
-        print("High Scores:")
-for i, score in enumerate(sorted(quiz.high_scores, reverse=True)[:5], start=1):
-        print(f"{i}. Score: {score}")
+
+    # Displaying high scores
+    print("High Scores:")
+    for i, (username, score) in enumerate(sorted(quiz.high_scores, key=lambda x: x[1], reverse=True)[:5], start=1):
+        print(f"{i}. {username}: Score: {score}")
