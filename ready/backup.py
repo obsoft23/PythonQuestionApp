@@ -74,6 +74,7 @@ class Quiz:
 
     def reset(self):
         self.score = 0
+       
 
     def add_high_score(self, username, score):
         self.high_scores.append((username, score))
@@ -146,6 +147,8 @@ if __name__ == "__main__":
         quiz.take_quiz()
         quiz.add_high_score(quiz.username, quiz.score) 
         average_score = quiz.get_average_score()
+        selected_questions = ""
+        quiz.reset()
         
         
         choice = input("Do you want to take the quiz again? (yes/no): ")
@@ -156,4 +159,4 @@ if __name__ == "__main__":
     print("High Scores:")
     for i, (username, score) in enumerate(sorted(quiz.high_scores, key=lambda x: x[1], reverse=True)[:5], start=1):
         print(f"{i}. {username}: Score: {score}")
-    print(f"Average score: {average_score:.2f}")
+    print(f"Average attempted user score: {average_score:.2f}")
